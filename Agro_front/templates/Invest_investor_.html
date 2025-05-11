@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invest with Cardano - Teffy Africa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        :root {
+            --cardano-blue: #0033AD;
+            --cardano-light: rgba(0, 51, 173, 0.1);
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --success: #00A68C;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--cardano-light), white);
+            padding: 2rem;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .investment-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .cardano-logo {
+            width: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--cardano-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .investment-form {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 30px rgba(0, 51, 173, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--cardano-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .optional {
+            font-size: 0.8rem;
+            color: #999;
+            margin-left: 0.5rem;
+        }
+
+        .form-input {
+            padding: 1rem;
+            border: 1px solid rgba(0, 51, 173, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--cardano-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 173, 0.1);
+        }
+
+        .amount-input {
+            position: relative;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .amount-input input {
+            padding-left: 2.5rem;
+        }
+
+        .ada-conversion {
+            font-size: 0.9rem;
+            color: var(--cardano-blue);
+            margin-top: 0.5rem;
+        }
+
+        .payment-section {
+            background: rgba(0, 51, 173, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .payment-title {
+            font-size: 1.1rem;
+            color: var(--cardano-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .wallet-address {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .submit-button {
+            background: var(--cardano-blue);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 51, 173, 0.3);
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            color: var(--success);
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .investment-form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="investment-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Cardano.svg" alt="Cardano Logo" class="cardano-logo">
+            <h1 class="page-title">Invest in Farm</h1>
+            <p class="subtitle">Secure investment powered by Cardano (ADA)</p>
+        </header>
+
+        <form class="investment-form" id="investmentForm">
+            <section class="form-section">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Investor Information
+                </h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="investorName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="investorEmail" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number <span class="optional">(optional)</span></label>
+                        <input type="tel" class="form-input" id="investorPhone">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"></path>
+                    </svg>
+                    Investment Details
+                </h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Investment Amount (USD)</label>
+                        <div class="amount-input">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" class="form-input" id="investmentAmount" min="100" step="100" required>
+                        </div>
+                        <div class="ada-conversion">≈ <span id="adaAmount">0</span> ADA</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Investment Duration</label>
+                        <select class="form-input" id="duration" required>
+                            <option value="3">3 months</option>
+                            <option value="6">6 months</option>
+                            <option value="12">12 months</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message to Farmer <span class="optional">(optional)</span></label>
+                        <textarea class="form-input" id="message" rows="3"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="payment-section">
+                <h3 class="payment-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    Cardano Payment Details
+                </h3>
+                <div class="wallet-address" id="walletAddress">
+                    addr1qxck2k6gq...3nsj6l35n0ck
+                </div>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=addr1qxck2k6gq...3nsj6l35n0ck"
+                     alt="Cardano Wallet QR Code"
+                     class="qr-code">
+            </section>
+
+            <button type="submit" class="submit-button">Complete Investment</button>
+            <div class="success-message" id="successMessage">
+                Investment submitted successfully! Transaction processing...
+            </div>
+        </form>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_Bafxrtzdw2D3BoXCNGC4XjjyWdurnaM",
+            authDomain: "tchat-af17d.firebaseapp.com",
+            databaseURL: "https://tchat-af17d-default-rtdb.firebaseio.com",
+            projectId: "tchat-af17d",
+            storageBucket: "tchat-af17d.appspot.com",
+            messagingSenderId: "895463164536",
+            appId: "1:895463164536:web:c1cbfc8658ea352b373b8d"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        let currentUserData = null;
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userRef = ref(database, `users/${user.uid}`);
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    currentUserData = snapshot.val();
+                    document.getElementById('investorName').value = currentUserData.name || '';
+                    document.getElementById('investorEmail').value = currentUserData.email || '';
+                    document.getElementById('investorPhone').value = currentUserData.phone || '';
+                }
+            } else {x1  
+                window.location.href = '/login';
+            }
+        });
+        const getFarmId = async () => {
+            try {
+                const response = await fetch('/get_farm');
+                const data = await response.json();
+                if (data.farmId) {
+                    return data.farmId;
+                } else {
+                    throw new Error('Farm ID not found');
+                }
+            } catch (error) {
+                console.error('Error fetching farm ID:', error);
+            }
+        };
+        const adaExchangeRate = 0.5; 
+        const investmentAmount = document.getElementById('investmentAmount');
+        const adaAmount = document.getElementById('adaAmount');
+        investmentAmount.addEventListener('input', () => {
+            const usdAmount = parseFloat(investmentAmount.value) || 0;
+            const ada = (usdAmount * adaExchangeRate).toFixed(2);
+            adaAmount.textContent = ada;
+        });
+        const investmentForm = document.getElementById('investmentForm');
+        const successMessage = document.getElementById('successMessage');
+        investmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUserData) {
+                alert('User data not loaded.');
+                return;
+            }
+            const amount = parseFloat(document.getElementById('investmentAmount').value);
+            const duration = document.getElementById('duration').value;
+            const message = document.getElementById('message').value;
+            const timestamp = new Date().toISOString();
+            const farmId = await getFarmId();
+            if (!farmId) {
+                alert('Farm ID not available.');
+                return;
+            }
+            const investmentData = {
+                farmId,
+                amount,
+                duration,
+                message,
+                timestamp,
+                status: 'pending',
+                email: currentUserData.email,
+                phone: document.getElementById('investorPhone').value
+            };
+            try {
+                const investorName = currentUserData.name.replace(/\s+/g, "_").toLowerCase(); // "XXX XXX" → "XXX_XX"
+                const investmentRef = ref(database, `investment/${farmId}/${investorName}`); // collateral-farmId 
+                const newInvestmentRef = push(investmentRef); // Unique K
+                await set(newInvestmentRef, investmentData);
+                successMessage.style.display = 'block';
+                investmentForm.reset();
+                adaAmount.textContent = "0";
+            } catch (error) {
+                console.error('Error saving investment:', error);
+                alert('Failed to process investment.');
+            }
+        });
+    </script>    
+</body>
+</html>

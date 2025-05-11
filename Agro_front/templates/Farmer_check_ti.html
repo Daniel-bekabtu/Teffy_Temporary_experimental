@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Teffy Africa</title>
+    <style>
+        /* All previous styles remain exactly the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --primary-green: #1a8d5f;
+            --light-green: rgba(26, 141, 95, 0.1);
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Add all the styles from the first code block here */
+        /* Add profile specific styles */
+        .profile-section {
+            display: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .profile-section.active {
+            display: block;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .edit-profile-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background: var(--dark-green);
+        }
+
+        .profile-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-field {
+            margin-bottom: 1rem;
+        }
+
+        .profile-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-value {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .edit-profile-section {
+            display: none;
+        }
+
+        .edit-profile-section.active {
+            display: block;
+        }
+
+        /* All other styles from the first code block */
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <main class="main-content">
+        <!-- Dashboard content -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Welcome back, <span id="profileName">John</span>!</h1>
+            <p class="dashboard-subtitle">Here's what's happening with your investments</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <!-- All stat cards -->
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <!-- Activity content -->
+        </div>
+
+        <!-- Profile Section -->
+        <section id="profileView" class="profile-section">
+            <div class="profile-header">
+                <h2>Profile Information</h2>
+                <button class="edit-profile-btn" onclick="showEditProfile()">Edit Profile</button>
+            </div>
+            <div class="profile-info">
+                <div class="profile-field">
+                    <div class="profile-label">Name</div>
+                    <div class="profile-value" id="profileName"></div>
+                </div>
+                <div class="profile-field">
+                    <div class="profile-label">Username</div>
+                    <div class="profile-value" id="profileUsername"></div>
+                </div>
+                <div class="profile-field">
+                    <div class="profile-label">Phone</div>
+                    <div class="profile-value" id="profilePhone"></div>
+                </div>
+                <div class="profile-field">
+                    <div class="profile-label">Bio</div>
+                    <div class="profile-value" id="profileBio"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edit Profile Section -->
+        <section id="editProfileSection" class="edit-profile-section">
+            <h2>Edit Profile</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">Phone</label>
+                    <input type="tel" id="editPhone" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="editBio">Bio</label>
+                    <textarea id="editBio" class="form-input"></textarea>
+                </div>
+                <button type="submit" class="signup-button">Save Changes</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Navigation -->
+    <nav class="bottom-nav">
+        <!-- Menu items -->
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_Bafxrtzdw2D3BoXCNGC4XjjyWdurnaM",
+            authDomain: "tchat-af17d.firebaseapp.com",
+            databaseURL: "https://tchat-af17d-default-rtdb.firebaseio.com",
+            projectId: "tchat-af17d",
+            storageBucket: "tchat-af17d.appspot.com",
+            messagingSenderId: "895463164536",
+            appId: "1:895463164536:web:c1cbfc8658ea352b373b8d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Profile functionality
+        const profileView = document.getElementById('profileView');
+        const editProfileSection = document.getElementById('editProfileSection');
+        const editProfileForm = document.getElementById('editProfileForm');
+
+        async function fetchUserData() {
+            try {
+                const response = await fetch("/User_fetch_request", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ someKey: "someValue" })
+                });
+
+                const raw_uid = await response.json();
+                if (raw_uid && raw_uid.user_id) {
+                    const uid = raw_uid.user_id;
+                    const userRef = ref(database, "users/" + uid);
+                    const snapshot = await get(userRef);
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        document.getElementById("profileName").textContent = data.name || "No name available";
+                        document.getElementById("profileUsername").textContent = data.username || "No username available";
+                        document.getElementById("profilePhone").textContent = data.phone || "Phone number not provided";
+                        document.getElementById("profileBio").textContent = data.bio || "Bio not available";
+                    } else {
+                        console.warn("No user data found");
+                    }
+                } else {
+                    window.location.href = "/login";
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                alert("Failed to fetch user data. Please try again.");
+            }
+        }
+
+        // Profile editing functionality
+        function showEditProfile() {
+            profileView.style.display = 'none';
+            editProfileSection.classList.add('active');
+        }
+
+        editProfileForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById("editName").value,
+                username: document.getElementById("editUsername").value,
+                phone: document.getElementById("editPhone").value,
+                bio: document.getElementById("editBio").value,
+            };
+
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const userRef = ref(database, "users/" + user.uid);
+                    await update(userRef, formData);
+                    document.getElementById("profileName").textContent = formData.name;
+                    document.getElementById("profileUsername").textContent = formData.username;
+                    document.getElementById("profilePhone").textContent = formData.phone;
+                    document.getElementById("profileBio").textContent = formData.bio;
+                    profileView.style.display = "block";
+                    editProfileSection.classList.remove("active");
+                    alert("Profile updated successfully!");
+                }
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                alert("Failed to update profile. Please try again.");
+            }
+        });
+
+        // Initialize particles.js
+        particlesJS('particles-js', {
+            // Particles.js configuration
+        });
+
+        // Menu handling
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                const route = item.getAttribute('data-route');
+                if (route === 'profile') {
+                    profileView.style.display = 'block';
+                    fetchUserData();
+                } else {
+                    window.location.href = route;
+                }
+            });
+        });
+
+        // Smooth scroll for menu container
+        const menuContainer = document.querySelector('.menu-container');
+        let isScrolling = false;
+        let startX;
+        let scrollLeft;
+
+        menuContainer.addEventListener('mousedown', (e) => {
+            isScrolling = true;
+            startX = e.pageX - menuContainer.offsetLeft;
+            scrollLeft = menuContainer.scrollLeft;
+        });
+
+        menuContainer.addEventListener('mouseleave', () => {
+            isScrolling = false;
+        });
+
+        menuContainer.addEventListener('mouseup', () => {
+            isScrolling = false;
+        });
+
+        menuContainer.addEventListener('mousemove', (e) => {
+            if (!isScrolling) return;
+            e.preventDefault();
+            const x = e.pageX - menuContainer.offsetLeft;
+            const walk = (x - startX) * 2;
+            menuContainer.scrollLeft = scrollLeft - walk;
+        });
+
+      // Notification handling
+      const notificationMenuItem = document.getElementById("notificationMenuItem");
+      const notificationBadge = document.getElementById("notificationBadge");
+
+      async function fetchNotifications() {
+        try {
+          const response = await fetch("/User_fetch_request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ someKey: "someValue" })
+          });
+
+          const raw_uid = await response.json();
+          if (raw_uid && raw_uid.user_id) {
+            const uid = raw_uid.user_id;
+            const notificationsRef = ref(database, "notifications/" + uid);
+            const snapshot = await get(notificationsRef);
+
+            if (snapshot.exists()) {
+              let unreadCount = 0;
+              snapshot.forEach((childSnapshot) => {
+                const notification = childSnapshot.val();
+                if (!notification.read) unreadCount++;
+              });
+              notificationBadge.textContent = unreadCount;
+              notificationBadge.style.display = unreadCount > 0 ? "flex" : "none";
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching notifications:", error);
+        }
+      }
+
+      notificationMenuItem.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = '/notifications';
+      });
+
+      // Initial fetch when page loads
+      fetchUserData();
+      fetchNotifications();
+    </script>
+</body>
+</html>

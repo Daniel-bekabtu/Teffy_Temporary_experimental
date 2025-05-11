@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile - Glassmorphic UI</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    :root {
+        --primary-green: rgba(26, 141, 95, 0.9);
+        --light-green: rgba(26, 141, 95, 0.1);
+        --lighter-green: rgba(26, 141, 95, 0.05);
+        --white: #ffffff;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+    }
+
+    body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--lighter-green), white);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .profile-container {
+        width: 100%;
+        max-width: 600px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .profile-container:hover {
+        transform: translateY(-5px);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        background: var(--light-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--primary-green);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+    }
+
+    .profile-title {
+        font-size: 1.8rem;
+        color: var(--primary-green);
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-subtitle {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 1rem;
+    }
+
+    .profile-content {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .profile-field {
+        background: rgba(255, 255, 255, 0.5);
+        padding: 1.2rem;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .profile-field:hover {
+        background: rgba(255, 255, 255, 0.8);
+        transform: translateX(5px);
+    }
+
+    .field-label {
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .field-value {
+        color: rgba(0, 0, 0, 0.8);
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .edit-button {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-top: 2rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .edit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 141, 95, 0.2);
+    }
+
+    .edit-form {
+        display: none;
+    }
+
+    .edit-form.active {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid rgba(26, 141, 95, 0.2);
+        border-radius: 12px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        background: white;
+    }
+
+    .form-label {
+        position: absolute;
+        left: 1rem;
+        top: 1rem;
+        color: rgba(0, 0, 0, 0.5);
+        transition: all 0.3s ease;
+        pointer-events: none;
+        font-size: 1rem;
+    }
+
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+        transform: translateY(-1.5rem);
+        font-size: 0.8rem;
+        color: var(--primary-green);
+    }
+
+    .save-button {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .save-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 141, 95, 0.2);
+    }
+
+    .cancel-button {
+        background: transparent;
+        color: var(--primary-green);
+        border: 1px solid var(--primary-green);
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .cancel-button:hover {
+        background: var(--light-green);
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 1rem;
+        }
+
+        .profile-container {
+            padding: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+        }
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar profile-picture-upload" id="profileAvatar">JD</div>
+      <input type="file" id="profilePictureInput" accept="image/*" style="display: none;" />
+      <h1 class="profile-title" id="profileName">John Doe</h1>
+      <p class="profile-subtitle" id="profileUsername">@johndoe</p>
+    </div>
+
+    <div class="profile-content" id="profileView">
+      <div class="profile-field">
+        <div class="field-label">Email</div>
+        <div class="field-value" id="profileEmail">john.doe@example.com</div>
+      </div>
+      <div class="profile-field">
+        <div class="field-label">Phone</div>
+        <div class="field-value" id="profilePhone">+1 234 567 8900</div>
+      </div>
+      <div class="profile-field">
+        <div class="field-label">Location</div>
+        <div class="field-value" id="profileLocation">New York, USA</div>
+      </div>
+      <div class="profile-field">
+        <div class="field-label">Bio</div>
+        <div class="field-value" id="profileBio">Frontend developer passionate about creating beautiful user experiences.</div>
+      </div>
+      <button class="edit-button" id="editProfileBtn">Edit Profile</button>
+    </div>
+
+    <form class="edit-form" id="editProfileForm">
+      <div class="form-group">
+        <input type="text" class="form-input" id="editName" placeholder=" ">
+        <label class="form-label" for="editName">Name</label>
+      </div>
+      <div class="form-group">
+        <input type="email" class="form-input" id="editEmail" placeholder=" ">
+        <label class="form-label" for="editEmail">Email</label>
+      </div>
+      <div class="form-group">
+        <input type="tel" class="form-input" id="editPhone" placeholder=" ">
+        <label class="form-label" for="editPhone">Phone</label>
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-input" id="editLocation" placeholder=" ">
+        <label class="form-label" for="editLocation">Location</label>
+      </div>
+      <div class="form-group">
+        <textarea class="form-input" id="editBio" placeholder=" " rows="3"></textarea>
+        <label class="form-label" for="editBio">Bio</label>
+      </div>
+      <button type="submit" class="save-button">Save Changes</button>
+      <button type="button" class="cancel-button" id="cancelEditBtn">Cancel</button>
+    </form>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_Bafxrtzdw2D3BoXCNGC4XjjyWdurnaM",
+      authDomain: "tchat-af17d.firebaseapp.com",
+      databaseURL: "https://tchat-af17d-default-rtdb.firebaseio.com",
+      projectId: "tchat-af17d",
+      storageBucket: "tchat-af17d.appspot.com",
+      messagingSenderId: "895463164536",
+      appId: "1:895463164536:web:c1cbfc8658ea352b373b8d"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+  
+    // Fetch user data after login
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const uid = user.uid;
+        const userRef = ref(database, "users/" + uid);
+        const snapshot = await get(userRef);
+  
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          document.querySelector(".profile-title").textContent = data.name || "No name";
+          document.querySelector(".profile-subtitle").textContent = "@" + (data.username || "nouser");
+          document.querySelectorAll('.field-value')[0].textContent = data.email || "No email";
+          document.querySelectorAll('.field-value')[1].textContent = data.phone || "No phone";
+          document.querySelectorAll('.field-value')[2].textContent = data.location || "No location";
+          document.querySelectorAll('.field-value')[3].textContent = data.bio || "No bio";
+  
+          // Update avatar initials
+          const initials = data.name?.split(' ').map(n => n[0]).join('').toUpperCase();
+          document.getElementById('profileAvatar').textContent = initials || "U";
+
+          document.getElementById('editName').value = data.name || "";
+          document.getElementById('editEmail').value = data.email || "";
+          document.getElementById('editPhone').value = data.phone || "";
+          document.getElementById('editLocation').value = data.location || "";
+          document.getElementById('editBio').value = data.bio || "";
+        }
+      } else {
+        window.location.href = "/login"; 
+      }
+    });
+    const editForm = document.getElementById('editProfileForm');
+    const editBtn = document.getElementById('editProfileBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const profileView = document.getElementById('profileView');
+
+    function showEditForm() {
+    editForm.classList.add('active');
+    profileView.style.display = 'none';
+    }
+
+    function hideEditForm() {
+    editForm.classList.remove('active');
+    profileView.style.display = 'grid';
+    }
+    editBtn.addEventListener('click', showEditForm);
+    cancelBtn.addEventListener('click', hideEditForm);
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return alert("Not authenticated.");
+      const uid = user.uid;
+      const formData = {
+        name: document.getElementById('editName').value,
+        email: document.getElementById('editEmail').value,
+        phone: document.getElementById('editPhone').value,
+        location: document.getElementById('editLocation').value,
+        bio: document.getElementById('editBio').value
+      };
+      try {
+        const userRef = ref(database, "users/" + uid);
+        await update(userRef, formData);
+
+        document.querySelector(".profile-title").textContent = formData.name;
+        document.querySelector(".profile-subtitle").textContent = "@" + (formData.username || "nouser");
+        document.querySelectorAll('.field-value')[0].textContent = formData.email;
+        document.querySelectorAll('.field-value')[1].textContent = formData.phone;
+        document.querySelectorAll('.field-value')[2].textContent = formData.location;
+        document.querySelectorAll('.field-value')[3].textContent = formData.bio;
+
+        const initials = formData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        document.getElementById('profileAvatar').textContent = initials;
+  
+        hideEditForm();
+        alert("Profile updated successfully!");
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Failed to update profile.");
+      }
+    });
+  </script>
+</body>
+</html>

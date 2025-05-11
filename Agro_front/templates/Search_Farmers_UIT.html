@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Details - Teffy Africa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        :root {
+            --primary-green: #1a8d5f;
+            --light-green: rgba(26, 141, 95, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-green), white);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .image-gallery {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-scroll {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            height: 100%;
+        }
+
+        .gallery-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-image {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .farm-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .farm-name {
+            font-size: 2.5rem;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .farm-location {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .details-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-item {
+            margin-bottom: 1.2rem;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .invest-button {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 141, 95, 0.3);
+            z-index: 100;
+        }
+
+        .invest-button:hover {
+            transform: translateX(-50%) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(26, 141, 95, 0.4);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--light-green);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .farm-name {
+                font-size: 2rem;
+            }
+
+            .image-gallery {
+                height: 300px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="image-gallery">
+            <div class="gallery-scroll" id="galleryScroll">
+            </div>
+            <div class="gallery-nav" id="galleryNav">
+            </div>
+        </div>
+
+        <div class="farm-header">
+            <h1 class="farm-name" id="farmName">Loading...</h1>
+            <div class="farm-location" id="farmLocation">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Loading...
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalArea">-</div>
+                    <div class="stat-label">Total Area (acres)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="fundAmount">-</div>
+                    <div class="stat-label">Investment Needed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="returnRate">-</div>
+                    <div class="stat-label">Return Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="paybackPeriod">-</div>
+                    <div class="stat-label">Payback Period</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="details-card">
+                <h2 class="card-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                    Farm Information
+                </h2>
+                <div class="detail-item">
+                    <div class="detail-label">Farm Type</div>
+                    <div class="detail-value" id="farmType">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Farming Practice</div>
+                    <div class="detail-value" id="farmingPractice">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Soil Type</div>
+                    <div class="detail-value" id="soilType">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Water Source</div>
+                    <div class="detail-value" id="waterSource">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Certifications</div>
+                    <div class="detail-value" id="certifications">-</div>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h2 class="card-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"></path>
+                    </svg>
+                    Financial Details
+                </h2>
+                <div class="detail-item">
+                    <div class="detail-label">Current Revenue</div>
+                    <div class="detail-value" id="currentRevenue">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Funding Purpose</div>
+                    <div class="detail-value" id="fundingPurpose">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Collateral</div>
+                    <div class="detail-value" id="collateral">-</div>
+                </div>
+            </div>
+
+            <div class="details-card">
+                <h2 class="card-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Owner Information
+                </h2>
+                <div class="detail-item">
+                    <div class="detail-label">Owner Name</div>
+                    <div class="detail-value" id="ownerName">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Contact Email</div>
+                    <div class="detail-value" id="contactEmail">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Contact Phone</div>
+                    <div class="detail-value" id="contactPhone">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Region</div>
+                    <div class="detail-value" id="region">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="invest-button" id="investButton">Start Investing</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_Bafxrtzdw2D3BoXCNGC4XjjyWdurnaM",
+            authDomain: "tchat-af17d.firebaseapp.com",
+            databaseURL: "https://tchat-af17d-default-rtdb.firebaseio.com",
+            projectId: "tchat-af17d",
+            storageBucket: "tchat-af17d.appspot.com",
+            messagingSenderId: "895463164536",
+            appId: "1:895463164536:web:c1cbfc8658ea352b373b8d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+
+        function updateGalleryDots(currentIndex, totalImages) {
+            const galleryNav = document.getElementById('galleryNav');
+            galleryNav.innerHTML = '';
+
+            for (let i = 0; i < totalImages; i++) {
+                const dot = document.createElement('div');
+                dot.className = `gallery-dot ${i === currentIndex ? 'active' : ''}`;
+                dot.onclick = () => scrollToImage(i);
+                galleryNav.appendChild(dot);
+            }
+        }
+
+        
+        function scrollToImage(index) {
+            const galleryScroll = document.getElementById('galleryScroll');
+            const imageWidth = galleryScroll.offsetWidth;
+            galleryScroll.scrollTo({
+                left: index * imageWidth,
+                behavior: 'smooth'
+            });
+        }
+
+        function handleGalleryScroll() {
+            const galleryScroll = document.getElementById('galleryScroll');
+            const imageWidth = galleryScroll.offsetWidth;
+            const currentIndex = Math.round(galleryScroll.scrollLeft / imageWidth);
+            const totalImages = galleryScroll.children.length;
+            updateGalleryDots(currentIndex, totalImages);
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const galleryScroll = document.getElementById('galleryScroll');
+
+            try {
+                const response = await fetch('/get_farm');
+                if (!response.ok) throw new Error('Failed to fetch selected farm ID');
+                const data = await response.json();
+                const farmId = data.farmId;
+                console.log('Farm ID:', farmId);
+                if (!farmId) throw new Error('No farm ID found');
+                const farmRef = ref(database, `farms/${farmId}`);
+                const snapshot = await get(farmRef);
+                if (snapshot.exists()) {
+                    const farmData = snapshot.val();
+                    console.log(farmData);
+                    if (farmData.images && farmData.images.length > 0) {
+                        galleryScroll.innerHTML = farmData.images.map(imageUrl => `
+                            <img src="${imageUrl}" alt="Farm image" class="gallery-image">
+                        `).join('');
+                        updateGalleryDots(0, farmData.images.length);
+                        galleryScroll.addEventListener('scroll', handleGalleryScroll);
+                    } else {
+                        // Fallback if no images are found
+                        galleryScroll.innerHTML = `
+                            <div class="no-images-placeholder">
+                                <p>No images available for this farm.</p>
+                            </div>
+                        `;
+            }
+
+                    if (farmData.images && farmData.images.length > 0) {
+                        galleryScroll.innerHTML = farmData.images.map(imageUrl => `
+                            <img src="${imageUrl}" alt="Farm image" class="gallery-image">
+                        `).join('');
+
+                        updateGalleryDots(0, farmData.images.length);
+                        galleryScroll.addEventListener('scroll', handleGalleryScroll);
+                    }
+                    document.getElementById('farmName').textContent = farmData.farmName || 'Unnamed Farm';
+                    document.getElementById('farmLocation').innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        ${farmData.farmAddress || 'Location not specified'}
+                    `;
+
+                    document.getElementById('totalArea').textContent = farmData.totalArea ? `${farmData.totalArea}` : '-';
+                    document.getElementById('fundAmount').textContent = farmData.fundAmount ?
+                        formatCurrency(farmData.fundAmount) : '-';
+                    document.getElementById('returnRate').textContent = farmData.returnRate ?
+                        `${farmData.returnRate}%` : '-';
+                    document.getElementById('paybackPeriod').textContent = farmData.paybackPeriod || '-';
+                    const fields = [
+                        'farmType', 'farmingPractice', 'soilType', 'waterSource', 'certifications',
+                        'currentRevenue', 'fundingPurpose', 'collateral',
+                        'ownerName', 'contactEmail', 'contactPhone', 'region'
+                    ];
+
+                    fields.forEach(field => {
+                        const element = document.getElementById(field);
+                        if (element) {
+                            element.textContent = farmData[field] || 'Not specified';
+                        }
+                    });
+
+                    document.getElementById('investButton').addEventListener('click', () => {
+                        window.location.href = `/invest_investor`;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading farm details:', error);
+                alert('Error loading farm details. Please try again later.');
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
